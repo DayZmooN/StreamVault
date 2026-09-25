@@ -19,7 +19,7 @@
 						"value": "@activity('Lookup3').output.value",
 						"type": "Expression"
 					},
-					"isSequential": false,
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "geoApi",
@@ -35,7 +35,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"method": "GET",
-								"url": "https://geo.api.gouv.fr/communes"
+								"url": "https://geo.api.gouv.fr/communes?codePostal="
 							}
 						}
 					]
