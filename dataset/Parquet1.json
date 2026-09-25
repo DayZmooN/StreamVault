@@ -1,0 +1,23 @@
+{
+	"name": "Parquet1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "code_postal",
+				"type": "INT32"
+			}
+		]
+	}
+}
