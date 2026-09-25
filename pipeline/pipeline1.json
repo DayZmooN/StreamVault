@@ -3,23 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "geoApi",
-				"type": "WebActivity",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "GET",
-					"url": "https://geo.api.gouv.fr/communes"
-				}
-			},
-			{
 				"name": "ForEach2",
 				"type": "ForEach",
 				"dependsOn": [
@@ -39,7 +22,7 @@
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Web1",
+							"name": "geoApi",
 							"type": "WebActivity",
 							"dependsOn": [],
 							"policy": {
@@ -52,7 +35,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"method": "GET",
-								"url": "https://geo.api.gouv.fr/communes?codePostal=01000"
+								"url": "https://geo.api.gouv.fr/communes"
 							}
 						}
 					]
@@ -61,14 +44,7 @@
 			{
 				"name": "Lookup3",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "geoApi",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
