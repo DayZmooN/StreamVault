@@ -102,7 +102,7 @@
 					{
 						"activity": "commune",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
