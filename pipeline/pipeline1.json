@@ -3,11 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ForEach2",
+				"name": "commune",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup3",
+						"activity": "LookupPostalCodes",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup3').output.value",
+						"value": "@activity('LookupPostalCodes').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
@@ -35,14 +35,37 @@
 							"userProperties": [],
 							"typeProperties": {
 								"method": "GET",
-								"url": "https://geo.api.gouv.fr/communes?codePostal="
+								"url": {
+									"value": "@concat('https://geo.api.gouv.fr/communes?codePostal=', string(item().code_postal))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "postalCommuneMap",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "geoApi",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "postalCommuneMap",
+								"value": {
+									"value": "@activity('geoApi').output\n",
+									"type": "Expression"
+								}
 							}
 						}
 					]
 				}
 			},
 			{
-				"name": "Lookup3",
+				"name": "LookupPostalCodes",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -71,8 +94,46 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "commune",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/kryahi.ext@simplonformations.co/enchisement_commune"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
+		"variables": {
+			"commune": {
+				"type": "Array"
+			},
+			"var_commune": {
+				"type": "Array"
+			},
+			"postalCommuneMap": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }
