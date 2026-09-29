@@ -1,0 +1,26 @@
+{
+	"name": "Parquet11",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-1875558602766228069-379ca5aa-49ca-4ba8-af4b-dad5620fa532-350-1-c000.snappy.parquet",
+				"folderPath": "clients/code_postal",
+				"fileSystem": "raw"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "code_postal",
+				"type": "INT32"
+			}
+		]
+	}
+}
