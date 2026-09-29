@@ -140,7 +140,7 @@
 					"notebookPath": "/Users/kryahi.ext@simplonformations.co/enrichisment_commune",
 					"baseParameters": {
 						"postalCommuneMap": {
-							"value": "@variables('postalCommuneMap')",
+							"value": "@string(variables('postalCommuneMap'))",
 							"type": "Expression"
 						}
 					}
