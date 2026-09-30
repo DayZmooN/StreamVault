@@ -1,0 +1,46 @@
+{
+	"name": "Parquet_clients_clean",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-7205992238198548357-d9f8dc1b-657c-4edd-8836-32227186e331-102-1-c000.snappy.parquet",
+				"folderPath": "clients/clients-clean",
+				"fileSystem": "clean"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "code_postal",
+				"type": "INT32"
+			},
+			{
+				"name": "nom",
+				"type": "UTF8"
+			},
+			{
+				"name": "prenom",
+				"type": "UTF8"
+			},
+			{
+				"name": "commune",
+				"type": "UTF8"
+			},
+			{
+				"name": "type",
+				"type": "UTF8"
+			}
+		]
+	}
+}
