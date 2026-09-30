@@ -170,35 +170,33 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"sink": {
-						"type": "ParquetSink",
+					"source": {
+						"type": "ParquetSource",
 						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
-							"type": "ParquetWriteSettings"
+							"type": "ParquetReadSettings"
 						}
 					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "code_postal",
-									"type": "Int32"
-								},
-								"sink": {
-									"name": "code_postal",
-									"type": "Int32"
-								}
-							}
-						]
-					}
+					"sink": {
+						"type": "MongoDbV2Sink",
+						"writeBatchTimeout": "00:30:00",
+						"writeBehavior": "insert"
+					},
+					"enableStaging": false
 				},
-				"outputs": [
+				"inputs": [
 					{
 						"referenceName": "Parquet_books_clean",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "MongoDbCotalogueBooks",
 						"type": "DatasetReference"
 					}
 				]
