@@ -384,6 +384,116 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "MongoDbClients",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Notebook2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "ParquetReadSettings"
+						}
+					},
+					"sink": {
+						"type": "MongoDbV2Sink",
+						"writeBatchTimeout": "00:30:00",
+						"writeBehavior": "upsert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "_id",
+									"type": "String"
+								},
+								"sink": {
+									"path": "_id"
+								}
+							},
+							{
+								"source": {
+									"name": "code_postal",
+									"type": "Int32"
+								},
+								"sink": {
+									"path": "code_postal"
+								}
+							},
+							{
+								"source": {
+									"name": "nom",
+									"type": "String"
+								},
+								"sink": {
+									"path": "nom"
+								}
+							},
+							{
+								"source": {
+									"name": "prenom",
+									"type": "String"
+								},
+								"sink": {
+									"path": "prenom"
+								}
+							},
+							{
+								"source": {
+									"name": "commune",
+									"type": "String"
+								},
+								"sink": {
+									"path": "commune"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String"
+								},
+								"sink": {
+									"path": "type"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Parquet_clients_clean",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "MongoDbClient",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"variables": {
