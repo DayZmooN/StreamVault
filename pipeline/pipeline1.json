@@ -162,9 +162,10 @@
 					"sink": {
 						"type": "MongoDbV2Sink",
 						"writeBatchTimeout": "00:30:00",
-						"writeBehavior": "insert"
+						"writeBehavior": "upsert"
 					},
 					"enableStaging": false,
+					"validateDataConsistency": false,
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
@@ -290,7 +291,7 @@
 					"sink": {
 						"type": "MongoDbV2Sink",
 						"writeBatchTimeout": "00:30:00",
-						"writeBehavior": "insert"
+						"writeBehavior": "upsert"
 					},
 					"enableStaging": false,
 					"translator": {
