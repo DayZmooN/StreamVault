@@ -426,8 +426,57 @@
 						"type": "TabularTranslator",
 						"mappings": [
 							{
+								"source": {
+									"name": "_id",
+									"type": "String"
+								},
 								"sink": {
-									"path": "$"
+									"path": "_id"
+								}
+							},
+							{
+								"source": {
+									"name": "code_postal",
+									"type": "Int32"
+								},
+								"sink": {
+									"path": "code_postal"
+								}
+							},
+							{
+								"source": {
+									"name": "nom",
+									"type": "String"
+								},
+								"sink": {
+									"path": "nom"
+								}
+							},
+							{
+								"source": {
+									"name": "prenom",
+									"type": "String"
+								},
+								"sink": {
+									"path": "prenom"
+								}
+							},
+							{
+								"source": {
+									"name": "commune",
+									"type": "String"
+								},
+								"sink": {
+									"path": "commune"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String"
+								},
+								"sink": {
+									"path": "type"
 								}
 							}
 						]
