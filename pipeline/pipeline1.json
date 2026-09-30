@@ -151,7 +151,7 @@
 				}
 			},
 			{
-				"name": "MongoDb",
+				"name": "MongoDbBooks",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -186,11 +186,216 @@
 						"writeBatchTimeout": "00:30:00",
 						"writeBehavior": "insert"
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "_id",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['_id']"
+								}
+							},
+							{
+								"source": {
+									"name": "title",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['title']"
+								}
+							},
+							{
+								"source": {
+									"name": "year",
+									"type": "Int32"
+								},
+								"sink": {
+									"path": "$['year']"
+								}
+							},
+							{
+								"source": {
+									"name": "genre",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['genre']"
+								}
+							},
+							{
+								"source": {
+									"name": "directors",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['directors']"
+								}
+							},
+							{
+								"source": {
+									"name": "pagesNumber",
+									"type": "Int32"
+								},
+								"sink": {
+									"path": "$['pagesNumber']"
+								}
+							},
+							{
+								"source": {
+									"name": "note",
+									"type": "Double"
+								},
+								"sink": {
+									"path": "$['note']"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['type']"
+								}
+							}
+						]
+					}
 				},
 				"inputs": [
 					{
 						"referenceName": "Parquet_books_clean",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "MongoDbCotalogueBooks",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "MongoDBMovies",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Notebook2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "ParquetReadSettings"
+						}
+					},
+					"sink": {
+						"type": "MongoDbV2Sink",
+						"writeBatchTimeout": "00:30:00",
+						"writeBehavior": "insert"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "_id",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['_id']"
+								}
+							},
+							{
+								"source": {
+									"name": "title",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['title']"
+								}
+							},
+							{
+								"source": {
+									"name": "year",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['year']"
+								}
+							},
+							{
+								"source": {
+									"name": "genre",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['genre']"
+								}
+							},
+							{
+								"source": {
+									"name": "directors",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['directors']"
+								}
+							},
+							{
+								"source": {
+									"name": "note_imdb",
+									"type": "Double"
+								},
+								"sink": {
+									"path": "$['pagesNumber']"
+								}
+							},
+							{
+								"source": {
+									"name": "cast",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['note']"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String"
+								},
+								"sink": {
+									"path": "$['type']"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Parquet_movies_clean",
 						"type": "DatasetReference"
 					}
 				],

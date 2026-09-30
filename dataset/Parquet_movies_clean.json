@@ -1,0 +1,54 @@
+{
+	"name": "Parquet_movies_clean",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-5098588799464463095-f0b904c7-e2d1-41b1-a3c7-9dddc3eb6549-60-1-c000.snappy.parquet",
+				"folderPath": "movies",
+				"fileSystem": "clean"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "title",
+				"type": "UTF8"
+			},
+			{
+				"name": "year",
+				"type": "UTF8"
+			},
+			{
+				"name": "genre",
+				"type": "UTF8"
+			},
+			{
+				"name": "cast",
+				"type": "UTF8"
+			},
+			{
+				"name": "directors",
+				"type": "UTF8"
+			},
+			{
+				"name": "note_imdb",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "type",
+				"type": "UTF8"
+			}
+		]
+	}
+}
