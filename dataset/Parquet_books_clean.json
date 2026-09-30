@@ -1,0 +1,54 @@
+{
+	"name": "Parquet_books_clean",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-3827524560761567272-d18ea951-fef1-4f4c-aab8-f1a8bc64cda3-105-1-c000.snappy.parquet",
+				"folderPath": "books",
+				"fileSystem": "clean"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "title",
+				"type": "UTF8"
+			},
+			{
+				"name": "year",
+				"type": "INT32"
+			},
+			{
+				"name": "genre",
+				"type": "UTF8"
+			},
+			{
+				"name": "directors",
+				"type": "UTF8"
+			},
+			{
+				"name": "pagesNumber",
+				"type": "INT32"
+			},
+			{
+				"name": "note",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "type",
+				"type": "UTF8"
+			}
+		]
+	}
+}
