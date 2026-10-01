@@ -419,7 +419,7 @@
 					"sink": {
 						"type": "MongoDbV2Sink",
 						"writeBatchTimeout": "00:30:00",
-						"writeBehavior": "upsert"
+						"writeBehavior": "insert"
 					},
 					"enableStaging": false,
 					"translator": {
