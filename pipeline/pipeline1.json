@@ -36,7 +36,7 @@
 							"typeProperties": {
 								"method": "GET",
 								"url": {
-									"value": "@concat('ht//geo.api.gouv.fr/communes?codePostal=', string(item().code_postal))",
+									"value": "@concat('https//geo.api.gouv.fr/communes?codePostal=', string(item().code_postal))",
 									"type": "Expression"
 								}
 							}
