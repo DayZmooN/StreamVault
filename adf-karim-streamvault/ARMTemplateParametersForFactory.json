@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-karim-streamvault"
+		},
+		"AzureDataLakeStoragekrstreamvault_accountKey": {
+			"value": ""
+		},
+		"AzureDatabricks1_accessToken": {
+			"value": ""
+		},
+		"AzureDatabricks2_accessToken": {
+			"value": ""
+		},
+		"MongoDb1_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStoragekrstreamvault_properties_typeProperties_url": {
+			"value": "https://kryahistreamvault.dfs.core.windows.net/"
+		},
+		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
+			"value": "0924-140814-41hmumqr"
+		},
+		"AzureDatabricks2_properties_typeProperties_existingClusterId": {
+			"value": "0924-130436-35oq0mn7"
+		},
+		"MongoDb1_properties_typeProperties_database": {
+			"value": "streamvault"
+		}
+	}
+}
