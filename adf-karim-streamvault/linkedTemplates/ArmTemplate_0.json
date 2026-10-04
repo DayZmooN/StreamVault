@@ -881,6 +881,35 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "commune",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {},
+							"url": "https://prod-05.francecentral.logic.azure.com:443/workflows/522eaa66484941d1851e5d5c0fef215e/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=cXRAz7R8sE9JoPf93r4qb1HqjNz6RclLbrpqX2Q-gao",
+							"body": {
+								"value": "@json(\n  concat(\n    '{',\n    '\"pipelineName\":\"', pipeline().Pipeline, '\",',\n    '\"runId\":\"', pipeline().RunId, '\",',\n    '\"errorMessage\":\"', 'Le pipeline a échoué', '\"',\n    '}'\n  )\n)\n",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
