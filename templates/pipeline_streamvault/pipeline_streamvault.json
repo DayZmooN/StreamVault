@@ -1,0 +1,804 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Nom de fabrique de données"
+		},
+		"AzureDatabricks2": {
+			"type": "string"
+		},
+		"AzureDataLakeStoragekrstreamvault": {
+			"type": "string"
+		},
+		"MongoDb1": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "commune",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "LookupPostalCodes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('LookupPostalCodes').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "geoApi",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat('https://geo.api.gouv.fr/communes?codePostal=', string(item().code_postal))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "postalCommuneMap",
+									"type": "AppendVariable",
+									"dependsOn": [
+										{
+											"activity": "geoApi",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "postalCommuneMap",
+										"value": {
+											"value": "@activity('geoApi').output\n",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "LookupPostalCodes",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "Parquet1",
+								"type": "DatasetReference"
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Notebook2",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "commune",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/kryahi.ext@simplonformations.co/Jalon_1__enrichisment_commune",
+							"baseParameters": {
+								"postalCommuneMap": {
+									"value": "@string(variables('postalCommuneMap'))",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "[parameters('AzureDatabricks2')]",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "MongoDbBooks",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Notebook2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "MongoDbV2Sink",
+								"writeBatchTimeout": "00:30:00",
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "_id",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['_id']"
+										}
+									},
+									{
+										"source": {
+											"name": "title",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['title']"
+										}
+									},
+									{
+										"source": {
+											"name": "year",
+											"type": "Int32"
+										},
+										"sink": {
+											"path": "$['year']"
+										}
+									},
+									{
+										"source": {
+											"name": "genre",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['genre']"
+										}
+									},
+									{
+										"source": {
+											"name": "directors",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['directors']"
+										}
+									},
+									{
+										"source": {
+											"name": "pagesNumber",
+											"type": "Int32"
+										},
+										"sink": {
+											"path": "$['pagesNumber']"
+										}
+									},
+									{
+										"source": {
+											"name": "note",
+											"type": "Double"
+										},
+										"sink": {
+											"path": "$['note']"
+										}
+									},
+									{
+										"source": {
+											"name": "type",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['type']"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet_books_clean",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "MongoDbCotalogueBooks",
+								"type": "DatasetReference"
+							}
+						]
+					},
+					{
+						"name": "MongoDBMovies",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Notebook2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "MongoDbV2Sink",
+								"writeBatchTimeout": "00:30:00",
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "_id",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['_id']"
+										}
+									},
+									{
+										"source": {
+											"name": "title",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['title']"
+										}
+									},
+									{
+										"source": {
+											"name": "year",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['year']"
+										}
+									},
+									{
+										"source": {
+											"name": "genre",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['genre']"
+										}
+									},
+									{
+										"source": {
+											"name": "directors",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['directors']"
+										}
+									},
+									{
+										"source": {
+											"name": "note_imdb",
+											"type": "Double"
+										},
+										"sink": {
+											"path": "$['pagesNumber']"
+										}
+									},
+									{
+										"source": {
+											"name": "cast",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['note']"
+										}
+									},
+									{
+										"source": {
+											"name": "type",
+											"type": "String"
+										},
+										"sink": {
+											"path": "$['type']"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet_movies_clean",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "MongoDbCotalogueBooks",
+								"type": "DatasetReference"
+							}
+						]
+					},
+					{
+						"name": "MongoDbClients",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Notebook2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "clients",
+									"wildcardFileName": "*.parquet",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "MongoDbV2Sink",
+								"writeBatchTimeout": "00:30:00",
+								"writeBehavior": "upsert"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "_id",
+											"type": "String"
+										},
+										"sink": {
+											"path": "_id"
+										}
+									},
+									{
+										"source": {
+											"name": "code_postal",
+											"type": "Int32"
+										},
+										"sink": {
+											"path": "code_postal"
+										}
+									},
+									{
+										"source": {
+											"name": "nom",
+											"type": "String"
+										},
+										"sink": {
+											"path": "nom"
+										}
+									},
+									{
+										"source": {
+											"name": "prenom",
+											"type": "String"
+										},
+										"sink": {
+											"path": "prenom"
+										}
+									},
+									{
+										"source": {
+											"name": "commune",
+											"type": "String"
+										},
+										"sink": {
+											"path": "commune"
+										}
+									},
+									{
+										"source": {
+											"name": "type",
+											"type": "String"
+										},
+										"sink": {
+											"path": "type"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Parquet_clients_clean",
+								"type": "DatasetReference"
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "MongoDbClient",
+								"type": "DatasetReference"
+							}
+						]
+					},
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "commune",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"url": "https://prod-05.francecentral.logic.azure.com:443/workflows/522eaa66484941d1851e5d5c0fef215e/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=cXRAz7R8sE9JoPf93r4qb1HqjNz6RclLbrpqX2Q-gao",
+							"body": {
+								"value": "@json(\n  concat(\n    '{',\n    '\"pipelineName\":\"', pipeline().Pipeline, '\",',\n    '\"runId\":\"', pipeline().RunId, '\",',\n    '\"errorMessage\":\"', 'Le pipeline a échoué', '\"',\n    '}'\n  )\n)\n",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"variables": {
+					"commune": {
+						"type": "Array"
+					},
+					"var_commune": {
+						"type": "Array"
+					},
+					"postalCommuneMap": {
+						"type": "Array"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Parquet1')]",
+				"[concat(variables('factoryId'), '/datasets/Parquet_books_clean')]",
+				"[concat(variables('factoryId'), '/datasets/MongoDbCotalogueBooks')]",
+				"[concat(variables('factoryId'), '/datasets/Parquet_movies_clean')]",
+				"[concat(variables('factoryId'), '/datasets/Parquet_clients_clean')]",
+				"[concat(variables('factoryId'), '/datasets/MongoDbClient')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStoragekrstreamvault')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-1875558602766228069-379ca5aa-49ca-4ba8-af4b-dad5620fa532-350-1-c000.snappy.parquet",
+						"folderPath": "clients/code_postal",
+						"fileSystem": "raw"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "code_postal",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet_books_clean')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStoragekrstreamvault')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-3827524560761567272-d18ea951-fef1-4f4c-aab8-f1a8bc64cda3-105-1-c000.snappy.parquet",
+						"folderPath": "books",
+						"fileSystem": "clean"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "title",
+						"type": "UTF8"
+					},
+					{
+						"name": "year",
+						"type": "INT32"
+					},
+					{
+						"name": "genre",
+						"type": "UTF8"
+					},
+					{
+						"name": "directors",
+						"type": "UTF8"
+					},
+					{
+						"name": "pagesNumber",
+						"type": "INT32"
+					},
+					{
+						"name": "note",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MongoDbCotalogueBooks')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('MongoDb1')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "MongoDbV2Collection",
+				"schema": [],
+				"typeProperties": {
+					"collection": "catalogue"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet_movies_clean')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStoragekrstreamvault')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-5098588799464463095-f0b904c7-e2d1-41b1-a3c7-9dddc3eb6549-60-1-c000.snappy.parquet",
+						"folderPath": "movies",
+						"fileSystem": "clean"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "title",
+						"type": "UTF8"
+					},
+					{
+						"name": "year",
+						"type": "UTF8"
+					},
+					{
+						"name": "genre",
+						"type": "UTF8"
+					},
+					{
+						"name": "cast",
+						"type": "UTF8"
+					},
+					{
+						"name": "directors",
+						"type": "UTF8"
+					},
+					{
+						"name": "note_imdb",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Parquet_clients_clean')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureDataLakeStoragekrstreamvault')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-1057094849161624346-8c730cab-819e-4cd3-bd39-d7c30024e035-41-1-c000.snappy.parquet",
+						"folderPath": "clients",
+						"fileSystem": "clean"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "code_postal",
+						"type": "INT32"
+					},
+					{
+						"name": "nom",
+						"type": "UTF8"
+					},
+					{
+						"name": "prenom",
+						"type": "UTF8"
+					},
+					{
+						"name": "commune",
+						"type": "UTF8"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MongoDbClient')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('MongoDb1')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "MongoDbV2Collection",
+				"schema": [],
+				"typeProperties": {
+					"collection": "clients"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
