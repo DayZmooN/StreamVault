@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "part-00000-tid-5098588799464463095-f0b904c7-e2d1-41b1-a3c7-9dddc3eb6549-60-1-c000.snappy.parquet",
-				"folderPath": "movies",
+				"fileName": "part-00000-tid-7257799950424893285-4a10db60-7bf6-457b-82c1-5bec8397c6c2-58-1-c000.snappy.parquet",
+				"folderPath": "clients",
 				"fileSystem": "clean"
 			},
 			"compressionCodec": "snappy"
