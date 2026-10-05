@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "part-00000-tid-3827524560761567272-d18ea951-fef1-4f4c-aab8-f1a8bc64cda3-105-1-c000.snappy.parquet",
+				"fileName": "part-00000-tid-7771083722869600355-1224c358-3110-443b-9aaa-f25a8324d8e6-30-1-c000.snappy.parquet",
 				"folderPath": "books",
 				"fileSystem": "clean"
 			},
