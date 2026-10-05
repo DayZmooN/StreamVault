@@ -348,7 +348,7 @@
 									"type": "Double"
 								},
 								"sink": {
-									"path": "$['pagesNumber']"
+									"path": "$['note_imdb']"
 								}
 							},
 							{
@@ -357,7 +357,7 @@
 									"type": "String"
 								},
 								"sink": {
-									"path": "$['note']"
+									"path": "$['cast']"
 								}
 							},
 							{
