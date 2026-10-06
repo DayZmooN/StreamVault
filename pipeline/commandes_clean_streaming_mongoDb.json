@@ -5,14 +5,7 @@
 			{
 				"name": "MongoDbCommandes",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Notebook3",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -58,6 +51,8 @@
 			{
 				"name": "Notebook3",
 				"type": "DatabricksNotebook",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
