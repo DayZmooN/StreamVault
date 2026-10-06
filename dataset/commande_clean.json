@@ -1,0 +1,37 @@
+{
+	"name": "commande_clean",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStoragekrstreamvault",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "commandes_clean",
+				"fileSystem": "clean"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "client_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "titre_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "prix",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "timestamp",
+				"type": "DOUBLE"
+			}
+		]
+	}
+}
